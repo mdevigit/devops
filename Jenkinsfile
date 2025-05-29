@@ -1,76 +1,51 @@
 pipeline {
   agent any
 
-  tools {
-    nodejs 'NodeJS_18' // Make sure this matches the tool name configured in Jenkins
-  }
-
-  environment {
-    FRONTEND_DIR = 'frontend'   // update this path if your React app is in a different folder
-    BACKEND_DIR = 'backend'     // update this path if your Node backend is in a different folder
-  }
-
   stages {
     stage('Checkout') {
       steps {
-        git 'https://github.com/mdevigit/devops.git'
+        git branch: 'main', url: 'https://github.com/YOUR_USERNAME/YOUR_REPO.git'
       }
     }
-
-    stage('Install Dependencies') {
+    stage('Install Frontend') {
       steps {
-        script {
-          echo 'Installing dependencies for frontend and backend...'
-          dir("${FRONTEND_DIR}") {
-            sh 'npm install'
-          }
-          dir("${BACKEND_DIR}") {
-            sh 'npm install'
-          }
+        dir('frontend') {
+          sh 'npm install'
         }
       }
     }
-
-    stage('Lint') {
+    stage('Install Backend') {
       steps {
-        script {
-          echo 'Running linters...'
-          dir("${FRONTEND_DIR}") {
-            sh 'npx eslint .'
-          }
-          dir("${BACKEND_DIR}") {
-            sh 'npx eslint .'
-          }
+        dir('backend') {
+          sh 'npm install'
         }
       }
     }
-
-    stage('Test') {
+    stage('Lint Frontend') {
       steps {
-        script {
-          echo 'Running tests...'
-          dir("${FRONTEND_DIR}") {
-            sh 'npm test'  // assuming using Jest/React Testing Library
-          }
-          dir("${BACKEND_DIR}") {
-            sh 'npm test'  // assuming using Mocha/Jest
-          }
+        dir('frontend') {
+          sh 'npm run lint'
         }
       }
     }
-
-    stage('Build') {
+    stage('Lint Backend') {
       steps {
-        script {
-          echo 'Building frontend...'
-          dir("${FRONTEND_DIR}") {
-            sh 'npm run build'
-          }
-          echo 'Preparing backend...'
-          dir("${BACKEND_DIR}") {
-            // Optional: transpile, bundle, etc.
-            echo 'No build step for backend, skipping...'
-          }
+        dir('backend') {
+          sh 'npm run lint'
+        }
+      }
+    }
+    stage('Test Frontend') {
+      steps {
+        dir('frontend') {
+          sh 'npm test'
+        }
+      }
+    }
+    stage('Test Backend') {
+      steps {
+        dir('backend') {
+          sh 'npm test'
         }
       }
     }
