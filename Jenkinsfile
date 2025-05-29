@@ -1,54 +1,21 @@
 pipeline {
-  agent any
+    agent any
 
-  stages {
-    stage('Clone Repo') {
-      steps {
-        git 'https://github.com/mdevigit/devops.git'
-      }
-    }
-
-    stage('Lint Frontend') {
-      steps {
-        dir('frontend') {
-          sh 'npm install'
-          sh 'npm run lint'
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Cloning repository...'
+                checkout scm
+            }
         }
-      }
-    }
 
-    stage('Test Frontend') {
-      steps {
-        dir('frontend') {
-          sh 'npm test'
+        stage('Build') {
+            steps {
+                echo 'Building...'
+                sh 'npm install --prefix frontend'
+                sh 'npm install --prefix backend'
+            }
         }
-      }
-    }
 
-    stage('Lint Backend') {
-      steps {
-        dir('backend') {
-          sh 'npm install'
-          sh 'npm run lint'
-        }
-      }
-    }
-
-    stage('Test Backend') {
-      steps {
-        dir('backend') {
-          sh 'npm test'
-        }
-      }
-    }
-
-    stage('Build Docker Images') {
-      steps {
-        sh 'docker-compose build'
-      }
-    }
-
-    stage('Deploy App') {
-      steps {
-        sh 'docker-compose up -d'
-      }
+        stage('Test') {
+            steps {
