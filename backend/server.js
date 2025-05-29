@@ -1,1 +1,10 @@
-console.log("Backend running on port 5000");
+const http = require('http');
+
+const server = http.createServer((req, res) => {
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end('Hello from Backend!\n');
+});
+
+server.listen(5000, () => {
+  console.log('Backend running on http://localhost:5000');
+});
